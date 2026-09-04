@@ -210,16 +210,17 @@ export function buildSeed(): DB {
   );
   log(2, 9, "request_created", "Income Tax Return request created for Suresh Traders", clientId(3), sureshItrReq);
 
-  // --- Priya Sharma: brand new client, no runs yet (empty state on client detail) ---
+  // --- Priya Sharma: no runs yet (empty state on client detail); created before the
+  // others so the empty state sorts to the end of the clients list, not the top ---
   db.clients.push({
     id: clientId(4),
     org_id: ORG_ID,
     name: "Priya Sharma",
     email: "priya.sharma@outlook.com",
     phone: "+91 99887 66554",
-    created_at: daysAgo(1),
+    created_at: daysAgo(75),
   });
-  log(1, 15, "client_created", "Priya Sharma was added as a client", clientId(4), null);
+  log(75, 15, "client_created", "Priya Sharma was added as a client", clientId(4), null);
 
   // sort activity feed newest first for convenience (store keeps insertion order; consumers can re-sort too)
   db.activity_logs.sort(

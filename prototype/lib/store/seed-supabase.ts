@@ -206,16 +206,16 @@ export async function buildSupabaseSeed(): Promise<DB> {
   );
   log(2, 9, "request_created", "Income Tax Return request created for Suresh Traders", "client_3", itrReq2);
 
-  // Priya Sharma — no runs yet
+  // Priya Sharma — no runs yet; created before the others so she sorts last
   db.clients.push({
     id: "client_4",
     org_id: ORG_ID,
     name: "Priya Sharma",
     email: "priya.sharma@outlook.com",
     phone: "+91 99887 66554",
-    created_at: daysAgo(1),
+    created_at: daysAgo(75),
   });
-  log(1, 15, "client_created", "Priya Sharma was added as a client", "client_4", null);
+  log(75, 15, "client_created", "Priya Sharma was added as a client", "client_4", null);
 
   db.activity_logs.sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
