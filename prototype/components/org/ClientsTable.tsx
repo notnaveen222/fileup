@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { relativeTime } from "@/lib/format";
@@ -68,6 +68,9 @@ export function ClientsTable({ clients }: { clients: ClientWithProgress[] }) {
                 <th className="hidden px-4 py-2.5 font-medium xl:table-cell">
                   Last activity
                 </th>
+                <th className="w-8 px-2 py-2.5 sm:hidden">
+                  <span className="sr-only">Open</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -75,7 +78,7 @@ export function ClientsTable({ clients }: { clients: ClientWithProgress[] }) {
                   <tr
                     key={c.id}
                     onClick={() => router.push(`/app/clients/${c.id}`)}
-                    className="group cursor-pointer border-b border-border last:border-0 hover:bg-surface-subtle"
+                    className="group cursor-pointer border-b border-border last:border-0 hover:bg-surface-subtle active:bg-surface-sunken"
                   >
                     <td className="min-w-0 px-3 py-3 sm:px-4">
                       <Link
@@ -103,6 +106,9 @@ export function ClientsTable({ clients }: { clients: ClientWithProgress[] }) {
                     </td>
                     <td className="hidden px-4 py-3 text-[13px] text-ink-muted xl:table-cell">
                       {c.last_activity_at ? relativeTime(c.last_activity_at) : "—"}
+                    </td>
+                    <td className="px-2 py-3 text-ink-muted sm:hidden">
+                      <ChevronRight size={15} />
                     </td>
                   </tr>
               ))}
