@@ -9,8 +9,8 @@ export default async function ClientsPage() {
 
   return (
     <div>
-      <header className="mb-6 flex items-center justify-between">
-        <div>
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-[20px] font-semibold tracking-tight text-ink">
             Clients
           </h1>
@@ -18,7 +18,9 @@ export default async function ClientsPage() {
             Everyone you&apos;re collecting documents from.
           </p>
         </div>
-        <AddClientButton />
+        <div className="shrink-0">
+          <AddClientButton />
+        </div>
       </header>
 
       <ClientsTable clients={clients} />

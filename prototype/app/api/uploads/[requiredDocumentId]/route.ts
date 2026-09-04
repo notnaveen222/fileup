@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { removeDocument, uploadDocument } from "@/lib/store/queries";
+import { ALLOWED_UPLOAD_MIME_TYPES, UPLOAD_REJECTION_MESSAGE } from "@/lib/uploads";
 
 const MAX_BYTES = 15 * 1024 * 1024; // 15MB — generous for a phone photo of a document
-const ALLOWED_MIME = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/heic",
-  "image/heif",
-]);
 
 export async function POST(
   req: NextRequest,
@@ -29,11 +22,8 @@ export async function POST(
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "File is too large (max 15MB)" }, { status: 400 });
   }
-  if (file.type && !ALLOWED_MIME.has(file.type)) {
-    return NextResponse.json(
-      { error: "Only PDF, JPG, PNG, WEBP or HEIC files are supported" },
-      { status: 400 }
-    );
+  if (file.type && !ALLOWED_UPLOAD_MIME_TYPES.has(file.type)) {
+    return NextResponse.json({ error: UPLOAD_REJECTION_MESSAGE }, { status: 400 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

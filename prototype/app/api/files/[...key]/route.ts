@@ -2,18 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyKey } from "@/lib/storage/sign";
+import { ALLOWED_UPLOAD_TYPES } from "@/lib/uploads";
 
 const ROOT = path.join(process.cwd(), "data", "uploads");
 
-const MIME_BY_EXT: Record<string, string> = {
-  ".pdf": "application/pdf",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".png": "image/png",
-  ".webp": "image/webp",
-  ".heic": "image/heic",
-  ".heif": "image/heif",
-};
+const MIME_BY_EXT: Record<string, string> = Object.fromEntries(
+  ALLOWED_UPLOAD_TYPES.flatMap((t) => t.ext.split(",").map((ext) => [ext, t.mime]))
+);
 
 /**
  * Stands in for a cloud provider's signed-URL redirect. The key is never

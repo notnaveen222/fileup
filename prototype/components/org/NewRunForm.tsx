@@ -56,6 +56,12 @@ export function NewRunForm({ client }: { client: Client }) {
     setSelected((prev) => prev.filter((d) => d !== name));
   }
 
+  function clearAll() {
+    setActiveTemplate(null);
+    setSelected([]);
+    setCustomDocs([]);
+  }
+
   const allDocs = [...selected];
   const canSubmit = label.trim().length > 0 && allDocs.length > 0 && !submitting;
 
@@ -127,9 +133,20 @@ export function NewRunForm({ client }: { client: Client }) {
       </section>
 
       <section className="mb-6">
-        <p className="mb-2 text-[13px] font-medium text-ink-muted">
-          Documents required ({allDocs.length} selected)
-        </p>
+        <div className="mb-2 flex items-center gap-2">
+          <p className="text-[13px] font-medium text-ink-muted">
+            Documents required ({allDocs.length} selected)
+          </p>
+          {allDocs.length > 0 && (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="text-[12.5px] font-medium text-accent hover:text-accent-hover hover:underline"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {COMMON_DOCUMENTS.map((doc) => {
             const checked = selected.includes(doc);

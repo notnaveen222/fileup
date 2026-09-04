@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Check, UploadCloud, X, Loader2, ExternalLink } from "lucide-react";
 import clsx from "clsx";
 import { fileSize } from "@/lib/format";
+import { UPLOAD_ACCEPT_ATTR, UPLOAD_HINT_TEXT } from "@/lib/uploads";
 
 export interface UploadRowDoc {
   requiredDocumentId: string;
@@ -119,7 +120,7 @@ export function UploadRow({
             </p>
           ) : (
             <p className="text-[12px] text-ink-faint">
-              {uploading ? "Uploading…" : "PDF, JPG or PNG"}
+              {uploading ? "Uploading…" : UPLOAD_HINT_TEXT}
             </p>
           )}
           {error && <p className="mt-0.5 text-[12px] text-[var(--danger)]">{error}</p>}
@@ -160,7 +161,7 @@ export function UploadRow({
         <input
           ref={inputRef}
           type="file"
-          accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif"
+          accept={UPLOAD_ACCEPT_ATTR}
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
