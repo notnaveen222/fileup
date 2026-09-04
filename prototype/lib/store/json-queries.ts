@@ -8,6 +8,7 @@ import type {
   ClientWithProgress,
   DocumentRequest,
   RequestWithDocs,
+  UploadedDocSummary,
 } from "@/lib/types";
 
 /**
@@ -271,7 +272,7 @@ export async function uploadDocument(input: {
   fileName: string;
   mimeType: string;
   buffer: Buffer;
-}): Promise<void> {
+}): Promise<UploadedDocSummary> {
   const db = readDb();
   const rd = db.required_documents.find((d) => d.id === input.requiredDocumentId);
   if (!rd) throw new Error("Required document not found");
@@ -283,6 +284,7 @@ export async function uploadDocument(input: {
   );
   const isReplace = Boolean(previous);
   const nextVersion = previous ? previous.version + 1 : 1;
+  const docId = newId("ud");
 
   const key = `${rd.request_id}/${rd.id}/${newId("up")}-${input.fileName}`;
   const storageKey = await storage.put({
@@ -304,7 +306,7 @@ export async function uploadDocument(input: {
     if (prev) prev.is_current = false;
 
     writable.uploaded_documents.push({
-      id: newId("ud"),
+      id: docId,
       required_document_id: writableRd.id,
       file_name: input.fileName,
       storage_key: storageKey,
@@ -352,6 +354,9 @@ export async function uploadDocument(input: {
       writableRequest.completed_at = null;
     }
   });
+
+  const url = await storage.signedGetUrl(storageKey);
+  return { id: docId, file_name: input.fileName, size_bytes: input.buffer.byteLength, url };
 }
 
 export async function removeDocument(requiredDocumentId: string): Promise<void> {

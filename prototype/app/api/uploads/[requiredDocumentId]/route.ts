@@ -38,8 +38,9 @@ export async function POST(
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
+  let document;
   try {
-    await uploadDocument({
+    document = await uploadDocument({
       requiredDocumentId,
       fileName: file.name || "document",
       mimeType: file.type || "application/octet-stream",
@@ -50,7 +51,7 @@ export async function POST(
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, document });
 }
 
 export async function DELETE(

@@ -42,34 +42,33 @@ function toRowDocs(data: ApiRequestData): UploadRowDoc[] {
   }));
 }
 
-export function ClientPortal({
-  token,
-  initialData,
-}: {
-  token: string;
-  initialData: ApiRequestData;
-}) {
-  const [data, setData] = useState(initialData);
+export function ClientPortal({ initialData }: { initialData: ApiRequestData }) {
+  const [docs, setDocs] = useState<UploadRowDoc[]>(() => toRowDocs(initialData));
 
-  const refresh = useCallback(async () => {
-    const res = await fetch(`/api/requests/by-token/${token}`, { cache: "no-store" });
-    if (res.ok) setData(await res.json());
-  }, [token]);
+  const setDocCurrent = useCallback(
+    (requiredDocumentId: string, current: UploadRowDoc["current"]) => {
+      setDocs((prev) =>
+        prev.map((d) => (d.requiredDocumentId === requiredDocumentId ? { ...d, current } : d))
+      );
+    },
+    []
+  );
 
-  const docs = toRowDocs(data);
-  const complete = data.total_count > 0 && data.received_count === data.total_count;
+  const received_count = docs.filter((d) => d.current).length;
+  const total_count = docs.length;
+  const complete = total_count > 0 && received_count === total_count;
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col px-4 py-8 sm:py-12">
       <header className="mb-6 text-center">
         <p className="text-[12.5px] font-medium uppercase tracking-wide text-ink-faint">
-          {data.org_name}
+          {initialData.org_name}
         </p>
         <h1 className="mt-1 text-[19px] font-semibold tracking-tight text-ink">
-          {data.label}
+          {initialData.label}
         </h1>
-        {data.description && (
-          <p className="mt-1.5 text-[13.5px] text-ink-muted">{data.description}</p>
+        {initialData.description && (
+          <p className="mt-1.5 text-[13.5px] text-ink-muted">{initialData.description}</p>
         )}
       </header>
 
@@ -77,10 +76,10 @@ export function ClientPortal({
         <div className="mb-1.5 flex items-center justify-between text-[12.5px] text-ink-muted">
           <span>Progress</span>
           <span className="font-mono">
-            {data.received_count} / {data.total_count}
+            {received_count} / {total_count}
           </span>
         </div>
-        <ProgressBar value={data.received_count} total={data.total_count} />
+        <ProgressBar value={received_count} total={total_count} />
       </div>
 
       {complete && (
@@ -95,12 +94,16 @@ export function ClientPortal({
 
       <div className="flex flex-col gap-2.5">
         {docs.map((doc) => (
-          <UploadRow key={doc.requiredDocumentId} doc={doc} onChanged={refresh} />
+          <UploadRow
+            key={doc.requiredDocumentId}
+            doc={doc}
+            onSetCurrent={(current) => setDocCurrent(doc.requiredDocumentId, current)}
+          />
         ))}
       </div>
 
       <p className="mt-8 text-center text-[11.5px] text-ink-faint">
-        Uploaded for {data.client_name} · Secured by ClientCollect
+        Uploaded for {initialData.client_name} · Secured by ClientCollect
       </p>
     </div>
   );

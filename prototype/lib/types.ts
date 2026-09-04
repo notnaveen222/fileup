@@ -88,6 +88,15 @@ export interface DB {
 
 /** Derived, UI-facing shapes — computed, never stored. */
 
+/** What uploadDocument() returns — just enough for the client to update its
+ * state optimistically without re-fetching the whole request. */
+export interface UploadedDocSummary {
+  id: ID;
+  file_name: string;
+  size_bytes: number;
+  url: string | null;
+}
+
 export interface RequestWithDocs extends DocumentRequest {
   required: (RequiredDocument & { current: UploadedDocument | null })[];
   received_count: number;

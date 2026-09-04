@@ -51,5 +51,5 @@ export default async function ClientUploadPage({
     required,
   };
 
-  return <ClientPortal token={token} initialData={data} />;
+  return <ClientPortal initialData={data} />;
 }

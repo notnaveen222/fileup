@@ -18,18 +18,20 @@ export interface UploadRowDoc {
 
 export function UploadRow({
   doc,
-  onChanged,
+  onSetCurrent,
 }: {
   doc: UploadRowDoc;
-  onChanged: () => void;
+  onSetCurrent: (current: UploadRowDoc["current"]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const busy = uploading || removing;
 
   async function handleFile(file: File) {
     setError(null);
-    setBusy(true);
+    setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -37,26 +39,46 @@ export function UploadRow({
         method: "POST",
         body: formData,
       });
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const data = await res.json().catch(() => null);
         setError(data?.error ?? "Upload failed — try again");
         return;
       }
-      onChanged();
+      // The upload itself can't be shown before it actually finishes, but
+      // once it has, the server hands back everything needed to update the
+      // row directly — no extra round trip to re-fetch the whole request.
+      onSetCurrent({
+        uploadedDocumentId: data.document.id,
+        fileName: data.document.file_name,
+        sizeBytes: data.document.size_bytes,
+        url: data.document.url,
+      });
     } catch {
       setError("Upload failed — try again");
     } finally {
-      setBusy(false);
+      setUploading(false);
     }
   }
 
   async function handleRemove() {
-    setBusy(true);
+    setError(null);
+    const previous = doc.current;
+    // Optimistic: nothing about removing a file needs to wait on the
+    // network, so update the row immediately and only roll back if the
+    // request actually fails.
+    onSetCurrent(null);
+    setRemoving(true);
     try {
-      await fetch(`/api/uploads/${doc.requiredDocumentId}`, { method: "DELETE" });
-      onChanged();
+      const res = await fetch(`/api/uploads/${doc.requiredDocumentId}`, { method: "DELETE" });
+      if (!res.ok) {
+        onSetCurrent(previous);
+        setError("Couldn't remove — try again");
+      }
+    } catch {
+      onSetCurrent(previous);
+      setError("Couldn't remove — try again");
     } finally {
-      setBusy(false);
+      setRemoving(false);
     }
   }
 
@@ -97,7 +119,7 @@ export function UploadRow({
             </p>
           ) : (
             <p className="text-[12px] text-ink-faint">
-              {busy ? "Uploading…" : "PDF, JPG or PNG"}
+              {uploading ? "Uploading…" : "PDF, JPG or PNG"}
             </p>
           )}
           {error && <p className="mt-0.5 text-[12px] text-[var(--danger)]">{error}</p>}
