@@ -92,23 +92,25 @@ button {
   animation: fade-in 0.18s ease-out;
 }
 
-.input {
-  width: 100%;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.1s, box-shadow 0.1s;
-}
+@layer components {
+  .input {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.1s, box-shadow 0.1s;
+  }
 
-.input::placeholder {
-  color: var(--ink-faint);
-}
+  .input::placeholder {
+    color: var(--ink-faint);
+  }
 
-.input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+  }
 }
